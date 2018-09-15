@@ -1,5 +1,5 @@
 all: prepare 
-	go install
+	go build -o ${GOPATH}/bin/gomeboycolor
 
 prepare:
 	go mod tidy
