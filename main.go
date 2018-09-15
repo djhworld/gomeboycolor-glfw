@@ -2,118 +2,129 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"runtime"
 	"strings"
+	"errors"
 
 	"github.com/djhworld/gomeboycolor/cartridge"
 	"github.com/djhworld/gomeboycolor/config"
 	"github.com/djhworld/gomeboycolor/gbc"
 	"github.com/djhworld/gomeboycolor-glfw/saves"
+	"gopkg.in/urfave/cli.v1"
 )
 
 const TITLE string = "gomeboycolor"
 
-var VERSION string
-
-const (
-	SKIP_BOOT_FLAG       string = "skipboot"
-	SCREEN_SIZE_FLAG            = "size"
-	SHOW_FPS_FLAG               = "showfps"
-	TITLE_FLAG                  = "title"
-	DUMP_FLAG                   = "dump"
-	DEBUGGER_ON_FLAG            = "debug"
-	BREAK_WHEN_FLAG             = "b"
-	COLOR_MODE_FLAG             = "color"
-	HELP_FLAG                   = "help"
-	HEADLESS_FLAG               = "headless"
-	FRAME_RATE_LOCK_FLAG        = "fpsLock"
-)
-
-var title *string = flag.String(TITLE_FLAG, TITLE, "Title to use")
-var showFps *bool = flag.Bool(SHOW_FPS_FLAG, false, "Calculate and display frames per second")
-var screenSizeMultiplier *int = flag.Int(SCREEN_SIZE_FLAG, 1, "Screen size multiplier")
-var skipBoot *bool = flag.Bool(SKIP_BOOT_FLAG, false, "Skip boot sequence")
-var colorMode *bool = flag.Bool(COLOR_MODE_FLAG, true, "Emulates Gameboy Color Hardware")
-var help *bool = flag.Bool(HELP_FLAG, false, "Show this help message")
-var headless *bool = flag.Bool(HEADLESS_FLAG, false, "Run emulator without output")
-var frameRatelock *int64 = flag.Int64(FRAME_RATE_LOCK_FLAG, 58, "Lock framerate to this. Going higher than default might be unstable!")
-
-//debug stuff...
-var dumpState *bool = flag.Bool(DUMP_FLAG, false, "Print state of machine after each cycle (WARNING - WILL RUN SLOW)")
-var debug *bool = flag.Bool(DEBUGGER_ON_FLAG, false, "Enable debugger")
-var breakOn *string = flag.String(BREAK_WHEN_FLAG, "0x0000", "Break into debugger when PC equals a given value between 0x0000 and 0xFFFF")
-
-func PrintHelp() {
-	fmt.Println("\nUsage: -\n")
-	fmt.Println("To launch the emulator, simply run and pass it the location of your ROM file, e.g. ")
-	fmt.Println("\n\tgomeboycolor location/of/romfile.gbc\n")
-	fmt.Println("Flags: -\n")
-	fmt.Println("	-help			->	Show this help message")
-	fmt.Println("	-skipboot		->	Disables the boot sequence and will boot you straight into the ROM you have provided. Defaults to false")
-	fmt.Println("	-color			->	Turns color GB features on. Defaults to true")
-	fmt.Println("	-showfps		->	Prints average frames per second to the console. Defaults to false")
-	fmt.Println("	-dump			-> 	Dump CPU state after every cycle. Will be very SLOW and resource intensive. Defaults to false")
-	fmt.Println("	-size=(1-6)		->	Set screen size. Defaults to 1.")
-	fmt.Println("	-headless		->	Runs emulator without output")
-	fmt.Println("	-fpsLock		->	Lock framerate to this. Going higher than default might be unstable!")
-	fmt.Println("	-title=(title)		->	Change window title. Defaults to 'gomeboycolor'.")
-	fmt.Println("\nYou can pass an option argument to the boolean flags if you want to enable that particular option. e.g. to disable the boot screen you would do the following")
-	fmt.Println("\n\tgomeboycolor -skipboot=false location/of/romfile.gbc\n")
-}
+var VERSION string = "0.0.1"
 
 func main() {
+	app := cli.NewApp()
+	app.Name = "gomeboycolor"
+	app.Usage = "Gameboy Color emulator"
+	app.ArgsUsage = "<path-to-ROM>"
+	app.Version=VERSION
+	app.UsageText= "gomeboycolor [flags] <path-to-ROM-file>"
+	app.Action = run
+
+	app.Flags = []cli.Flag {
+		cli.StringFlag{
+		  Name: "title",
+		  Value: TITLE,
+		  Usage: "Title to use",
+		},
+		cli.BoolFlag{
+		  Name: "showfps",
+		  Usage: "Calculate and display frames per second",
+		},
+		cli.BoolFlag{
+		  Name: "skipboot",
+		  Usage: "Skip boot sequence",
+		},
+		cli.BoolFlag{
+		  Name: "no-color",
+		  Usage: "Disable Gameboy Color Hardware",
+		},
+		cli.BoolFlag{
+		  Name: "headless",
+		  Usage: "Run emulator without output",
+		},
+		cli.Int64Flag{
+		  Name: "fpslock",
+		  Value: 58,
+		  Usage: "Lock framerate to this. Going higher than default might be unstable!",
+		},
+		cli.IntFlag{
+		  Name: "size",
+		  Value: 1,
+		  Usage: "Screen size multiplier",
+		},
+		cli.BoolFlag{
+		  Name: "debug",
+		  Usage: "Enable debugger",
+		},
+		cli.BoolFlag{
+		  Name: "dump",
+		  Usage: "Print state of machine after each cycle (WARNING - WILL RUN SLOW)",
+		},
+		cli.StringFlag{
+		  Name: "b",
+		  Value: "0x0000",
+		  Usage: "Break into debugger when PC equals a given value between 0x0000 and 0xFFFF",
+		},
+	  }
+  
+	err := app.Run(os.Args)
+	if err != nil {
+	  log.Fatal(err)
+	}
+}
+
+
+func run(c *cli.Context) error {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	fmt.Printf("%s. %s\n", TITLE, VERSION)
 	fmt.Println("Copyright (c) 2018. Daniel James Harper.")
 	fmt.Println("http://djhworld.github.io/gomeboycolor")
 	fmt.Println(strings.Repeat("*", 120))
 
-	flag.Usage = PrintHelp
-
-	flag.Parse()
-
-	if *help {
-		PrintHelp()
-		os.Exit(1)
+	if c.NArg() != 1 {
+		return errors.New("Please specify the location of a ROM to boot")
 	}
 
-	if flag.NArg() != 1 {
-		log.Fatalf("Please specify the location of a ROM to boot")
-		return
+	var colorMode bool = true
+	if c.Bool("no-color") {
+		colorMode = false
 	}
 
 	//Parse and validate settings file (if found)
 	conf := &config.Config{
 		Title:         TITLE,
-		ScreenSize:    *screenSizeMultiplier,
-		SkipBoot:      *skipBoot,
-		DisplayFPS:    *showFps,
-		ColorMode:     *colorMode,
-		Debug:         *debug,
-		BreakOn:       *breakOn,
-		DumpState:     *dumpState,
-		Headless:      *headless,
-		FrameRateLock: *frameRatelock,
+		ScreenSize:    c.Int("size"),
+		SkipBoot:      c.Bool("skipboot"),
+		DisplayFPS:    c.Bool("showfps"),
+		ColorMode:     colorMode,
+		Debug:         c.Bool("debug"),
+		BreakOn:       c.String("b"),
+		DumpState:     c.Bool("dump"),
+		Headless:      c.Bool("headless"),
+		FrameRateLock: c.Int64("fpslock"),
 	}
 	fmt.Println(conf)
 
-	cart, err := createCartridge(flag.Arg(0))
+	cart, err := createCartridge(c.Args().Get(0))
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	log.Println("Starting emulator")
 
 	emulator, err := gbc.Init(cart, getSaveStore(), conf, NewGlfwIO(conf.FrameRateLock, conf.Headless, conf.DisplayFPS))
 	if err != nil {
-		log.Println(err)
-		return
+		return err
 	}
 
 	//Starts emulator code in a goroutine
@@ -126,6 +137,7 @@ func main() {
 	emulator.RunIO()
 
 	log.Println("Goodbye!")
+	return nil
 }
 
 func getSaveStore() *saves.FileSystemStore {

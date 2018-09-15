@@ -12,3 +12,5 @@ github.com/stretchrcom/testify v1.2.2 h1:R5L+N9NKlaO/Q0Dvq8kBEV/uRKEa/Mt2Wt2WNtM
 github.com/stretchrcom/testify v1.2.2/go.mod h1:zUrQijuLcfRPyrWG6SBFjct9CuJZz2Ybtack4DGF2Jo=
 golang.org/x/image v0.0.0-20180708004352-c73c2afc3b81 h1:00VmoueYNlNz/aHIilyyQz/MHSqGoWJzpFv/HW8xpzI=
 golang.org/x/image v0.0.0-20180708004352-c73c2afc3b81/go.mod h1:ux5Hcp/YLpHSI86hEcLt0YII63i6oz57MZXIpbrjZUs=
+gopkg.in/urfave/cli.v1 v1.20.0 h1:NdAVW6RYxDif9DhDHaAortIu956m2c0v+09AZBPTbE0=
+gopkg.in/urfave/cli.v1 v1.20.0/go.mod h1:vuBzUtMdQeixQj8LVd+/98pzhxNGQoyuPBlsXHOQNO0=
