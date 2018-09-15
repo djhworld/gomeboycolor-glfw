@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/djhworld/gomeboycolor/types"
 	"github.com/djhworld/gomeboycolor/inputoutput"
+	"github.com/djhworld/gomeboycolor/types"
 
 	"github.com/go-gl/gl/v2.1/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"

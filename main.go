@@ -2,18 +2,18 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
 	"os/user"
 	"runtime"
 	"strings"
-	"errors"
 
+	"github.com/djhworld/gomeboycolor-glfw/saves"
 	"github.com/djhworld/gomeboycolor/cartridge"
 	"github.com/djhworld/gomeboycolor/config"
 	"github.com/djhworld/gomeboycolor/gbc"
-	"github.com/djhworld/gomeboycolor-glfw/saves"
 	"gopkg.in/urfave/cli.v1"
 )
 
@@ -26,63 +26,62 @@ func main() {
 	app.Name = "gomeboycolor"
 	app.Usage = "Gameboy Color emulator"
 	app.ArgsUsage = "<path-to-ROM>"
-	app.Version=VERSION
-	app.UsageText= "gomeboycolor [flags] <path-to-ROM-file>"
+	app.Version = VERSION
+	app.UsageText = "gomeboycolor [flags] <path-to-ROM-file>"
 	app.Action = run
 
-	app.Flags = []cli.Flag {
+	app.Flags = []cli.Flag{
 		cli.StringFlag{
-		  Name: "title",
-		  Value: TITLE,
-		  Usage: "Title to use",
+			Name:  "title",
+			Value: TITLE,
+			Usage: "Title to use",
 		},
 		cli.BoolFlag{
-		  Name: "showfps",
-		  Usage: "Calculate and display frames per second",
+			Name:  "showfps",
+			Usage: "Calculate and display frames per second",
 		},
 		cli.BoolFlag{
-		  Name: "skipboot",
-		  Usage: "Skip boot sequence",
+			Name:  "skipboot",
+			Usage: "Skip boot sequence",
 		},
 		cli.BoolFlag{
-		  Name: "no-color",
-		  Usage: "Disable Gameboy Color Hardware",
+			Name:  "no-color",
+			Usage: "Disable Gameboy Color Hardware",
 		},
 		cli.BoolFlag{
-		  Name: "headless",
-		  Usage: "Run emulator without output",
+			Name:  "headless",
+			Usage: "Run emulator without output",
 		},
 		cli.Int64Flag{
-		  Name: "fpslock",
-		  Value: 58,
-		  Usage: "Lock framerate to this. Going higher than default might be unstable!",
+			Name:  "fpslock",
+			Value: 58,
+			Usage: "Lock framerate to this. Going higher than default might be unstable!",
 		},
 		cli.IntFlag{
-		  Name: "size",
-		  Value: 1,
-		  Usage: "Screen size multiplier",
+			Name:  "size",
+			Value: 1,
+			Usage: "Screen size multiplier",
 		},
 		cli.BoolFlag{
-		  Name: "debug",
-		  Usage: "Enable debugger",
+			Name:  "debug",
+			Usage: "Enable debugger",
 		},
 		cli.BoolFlag{
-		  Name: "dump",
-		  Usage: "Print state of machine after each cycle (WARNING - WILL RUN SLOW)",
+			Name:  "dump",
+			Usage: "Print state of machine after each cycle (WARNING - WILL RUN SLOW)",
 		},
 		cli.StringFlag{
-		  Name: "b",
-		  Value: "0x0000",
-		  Usage: "Break into debugger when PC equals a given value between 0x0000 and 0xFFFF",
+			Name:  "b",
+			Value: "0x0000",
+			Usage: "Break into debugger when PC equals a given value between 0x0000 and 0xFFFF",
 		},
-	  }
-  
+	}
+
 	err := app.Run(os.Args)
 	if err != nil {
-	  log.Fatal(err)
+		log.Fatal(err)
 	}
 }
-
 
 func run(c *cli.Context) error {
 	runtime.GOMAXPROCS(runtime.NumCPU())
