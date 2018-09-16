@@ -38,6 +38,14 @@ This will install the binary `gomeboycolor` to your GOBIN.
 gomeboycolor <path-to-rom-file>
 ```
 
+
+### Features
+
+See [here](https://github.com/djhworld/gomeboycolor#features)
+
+Battery saves are stored on your filesystem under `$HOME/.gomeboycolor`
+
+
 License
 -----------------------------
 
