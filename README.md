@@ -4,6 +4,8 @@ gomeboycolor
 
 Nintendo Gameboy Color emulator, this is my first emulator so I'm learning as I go along...
 
+This repository is the frontend for running the emulator using `libglfw`. The backend that implements the emulator can be found in: [djhworld/gomeboycolor](https://github.com/djhworld/gomeboycolor)
+
 You are welcome to visit the github page for this project by [clicking here](http://djhworld.github.io/gomeboycolor), this includes links to [executables](http://djhworld.github.io/gomeboycolor/#downloads), [documentation](http://djhworld.github.io/gomeboycolor/#documentation) and some [background about the project](http://djhworld.github.io/gomeboycolor/#about).
 
 FAQ
@@ -12,13 +14,16 @@ FAQ
 
 ### How do I build it?
 
+#### Pre-requisites 
+
 You will need 
 
 * an installation of [Go](http://golang.org) (version >= 1.11.0)
-* `libglfw3.2`
-* `libGLEW`
+* An environment with `libglfw` available
+  * Follow the [Installation instructions](https://github.com/go-gl/glfw) here for your OS.
+    * OSX users should just need to have Xcode Command Line Tools installed.
 
-Run
+#### Run
 
 ```
 make
@@ -26,14 +31,12 @@ make
 
 This will install the binary `gomeboycolor` to your GOBIN. 
 
-### How do I run it
+
+### How do I run it?
 
 ```
 gomeboycolor <path-to-rom-file>
 ```
-
-License
------------------------------
 
 License
 -----------------------------
