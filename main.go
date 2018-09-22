@@ -121,13 +121,13 @@ func run(c *cli.Context) error {
 
 	log.Println("Starting emulator")
 
-	emulator, err := gbc.Init(cart, getSaveStore(), conf, NewGlfwIO(conf.Headless, conf.DisplayFPS))
+	emulator, err := gbc.Init(cart, getSaveStore(), conf, NewGlfwIO(conf.FrameRateLock, conf.Headless, conf.DisplayFPS))
 	if err != nil {
 		return err
 	}
 
 	//Starts emulator code in a goroutine
-	go emulator.Run(conf.FrameRateLock)
+	go emulator.Run()
 
 	//lock the OS thread here
 	runtime.LockOSThread()
