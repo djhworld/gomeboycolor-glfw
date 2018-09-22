@@ -28,7 +28,7 @@ type GlfwIO struct {
 	glfwDisplay *glfwDisplay
 }
 
-func NewGlfwIO(frameRateLock int64, headless bool, displayFps bool) *GlfwIO {
+func NewGlfwIO(headless bool, displayFps bool) *GlfwIO {
 	log.Println("Creating GLFW based IO Handler")
 	glfwDisplay := new(glfwDisplay)
 
@@ -39,7 +39,7 @@ func NewGlfwIO(frameRateLock int64, headless bool, displayFps bool) *GlfwIO {
 	}
 
 	return &GlfwIO{
-		inputoutput.NewCoreIO(frameRateLock, headless, frameRateReporter, glfwDisplay),
+		inputoutput.NewCoreIO(headless, frameRateReporter, glfwDisplay),
 		glfwDisplay,
 	}
 }
