@@ -54,7 +54,7 @@ func main() {
 		},
 		cli.Int64Flag{
 			Name:  "fpslock",
-			Value: 58,
+			Value: 59,
 			Usage: "Lock framerate to this. Going higher than default might be unstable!",
 		},
 		cli.IntFlag{
@@ -126,8 +126,12 @@ func run(c *cli.Context) error {
 		return err
 	}
 
+	dumbFrameRunnerWrapper := func(doFrame func()) {
+		doFrame()
+	}
+
 	//Starts emulator code in a goroutine
-	go emulator.Run()
+	go emulator.Run(dumbFrameRunnerWrapper)
 
 	//lock the OS thread here
 	runtime.LockOSThread()

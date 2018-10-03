@@ -6,7 +6,7 @@ import (
 	"github.com/djhworld/gomeboycolor/inputoutput"
 	"github.com/djhworld/gomeboycolor/types"
 
-	"github.com/go-gl/gl/v2.1/gl"
+	"github.com/go-gl/gl/v3.2-compatibility/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 )
 
